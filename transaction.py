@@ -58,7 +58,6 @@ class Kapitalbank:
         print(response)
         print("***************************")
 
-        # Check if response is a dictionary and contains the expected keys
         if isinstance(response, dict):
             order = response.get("TKKPG", {}).get("Response", {}).get("Order", {})
             OrderID = response.get("TKKPG", {}).get("Response", {}).get("Order", {}).get("OrderID", {})
