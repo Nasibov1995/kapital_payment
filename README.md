@@ -1,1 +1,1 @@
-# kapital_payment
+pip install requests xmltodict
