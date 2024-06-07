@@ -46,7 +46,7 @@ class Kapitalbank:
         
  
         
-    def save_card(self,amount,language,currency):
+    def save_card(self,amount,language):
         response = requests.post(
             self.url,
             data=f'''<?xml version="1.0" encoding="utf-8"?>
@@ -58,7 +58,7 @@ class Kapitalbank:
                         <OrderType>Purchase</OrderType>
                         <Merchant>E1000010</Merchant>
                         <Amount>{int(float(amount) * 100)}</Amount>
-                        <Currency>{currency}</Currency>
+                        <Currency>944</Currency>
                         <Description>x</Description>
                         <ApproveURL>app.com</ApproveURL>
                         <CancelURL>can.com</CancelURL>
@@ -88,7 +88,7 @@ class Kapitalbank:
         else:
             return {"error": f"HTTP Error {response.status_code}"}
         
-    def pay_with_saved_card(self,amount,language,currency):
+    def pay_with_saved_card(self,amount,language):
         response = requests.post(
             self.url,
             data=f'''<?xml version="1.0" encoding="utf-8"?>
@@ -100,7 +100,7 @@ class Kapitalbank:
                             <OrderType>Purchase</OrderType>
                             <Merchant>E1000010</Merchant>
                             <Amount>{int(float(amount) * 100)}</Amount>
-                            <Currency>{currency}</Currency>
+                            <Currency>944</Currency>
                             <Description>xxxxxxxx</Description>
                             <ApproveURL>https://www.empowerwoman.az</ApproveURL>
                             <CancelURL>can.com</CancelURL>
@@ -149,6 +149,38 @@ class Kapitalbank:
         else:
             return {"error": "Invalid response format"}
         
+    def get_order_url_saved_card(self, amount, language):
+        response = self.save_card(amount, language)
+       
+
+        if isinstance(response, dict):
+            order = response.get("TKKPG", {}).get("Response", {}).get("Order", {})
+            OrderID = response.get("TKKPG", {}).get("Response", {}).get("Order", {}).get("OrderID", {})
+            SessionID = response.get("TKKPG", {}).get("Response", {}).get("Order", {}).get("SessionID", {})
+
+            if "URL" in order:
+                return order["URL"] + '?' + 'ORDERID=' + OrderID + '&SESSIONID=' + SessionID
+            else:
+                return {"error": "URL not found in response"}
+        else:
+            return {"error": "Invalid response format"}
+        
+    def get_order_url_pay_with_saved_card(self, amount, language):
+        response = self.pay_with_saved_card(amount, language)
+       
+
+        if isinstance(response, dict):
+            order = response.get("TKKPG", {}).get("Response", {}).get("Order", {})
+            OrderID = response.get("TKKPG", {}).get("Response", {}).get("Order", {}).get("OrderID", {})
+            SessionID = response.get("TKKPG", {}).get("Response", {}).get("Order", {}).get("SessionID", {})
+
+            if "URL" in order:
+                return order["URL"] + '?' + 'ORDERID=' + OrderID + '&SESSIONID=' + SessionID
+            else:
+                return {"error": "URL not found in response"}
+        else:
+            return {"error": "Invalid response format"}
+        
         
     def get_order_id(self,amount,language):
         response = self.send_request(amount,language)
@@ -160,7 +192,7 @@ class Kapitalbank:
 
 
 xml_requester = Kapitalbank(environment='test')
-url = xml_requester.get_order_url(amount=5, language='AZ')
+url = xml_requester.get_order_url_saved_card(amount=5, language='AZ')
 
 
 
