@@ -102,7 +102,7 @@ class Kapitalbank:
                             <Amount>{int(float(amount) * 100)}</Amount>
                             <Currency>{currency}</Currency>
                             <Description>xxxxxxxx</Description>
-                            <ApproveURL>app.com</ApproveURL>
+                            <ApproveURL>https://www.empowerwoman.az</ApproveURL>
                             <CancelURL>can.com</CancelURL>
                             <DeclineURL>dec.com</DeclineURL>
                             <AddParams> 
@@ -148,15 +148,30 @@ class Kapitalbank:
                 return {"error": "URL not found in response"}
         else:
             return {"error": "Invalid response format"}
+        
+        
+    def get_order_id(self,amount,language):
+        response = self.send_request(amount,language)
+        if isinstance(response, dict):
+
+            OrderID = response.get("TKKPG", {}).get("Response", {}).get("Order", {}).get("OrderID", {})
+
+            return OrderID
 
 
 xml_requester = Kapitalbank(environment='test')
 url = xml_requester.get_order_url(amount=5, language='AZ')
 
-print("Save Card : " , xml_requester.save_card(amount=5, language='AZ',currency='AZN'))
-print("------------------------------")
-print("Pay with Saved Card : " , xml_requester.save_card(amount=5, language='AZ',currency='AZN'))
-print("------------------------------")
+
+
+# print("Save Card : " , xml_requester.save_card(amount=5, language='AZ',currency='AZN'))
+# print("------------------------------")
+# print("Pay with Saved Card : " , xml_requester.save_card(amount=5, language='AZ',currency='AZN'))
+# print("------------------------------")
 print("Order URL : ", url)
+
+
+print("Order ID : ", xml_requester.get_order_id(5,'AZ'))
+
 
 
